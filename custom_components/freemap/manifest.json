@@ -1,12 +1,12 @@
 {
   "domain": "freemap",
   "name": "Freemap Tracking",
-  "documentation": "https://www.freemap.sk",
-  "issue_tracker": "https://github.com/jose1711/freemap-ha/issues",
-  "requirements": [],
-  "dependencies": [],
   "codeowners": ["@jose1711"],
   "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://www.freemap.sk",
   "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/jose1711/freemap-ha/issues",
+  "requirements": [],
   "version": "1.0.0"
 }
