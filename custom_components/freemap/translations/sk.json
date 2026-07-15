@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Freemap Tracking",
+        "description": "Zadajte autentifikačný token alebo verejné tokeny zariadení.\n\n{token_help}",
+        "data": {
+          "auth_token": "Auth token (pre vlastné zariadenia)",
+          "public_tokens": "Verejné tokeny (čiarkou oddelené, napr. RaAiejax)"
+        }
+      }
+    },
+    "error": {
+      "no_credentials": "Zadajte aspoň auth token alebo jeden verejný token.",
+      "invalid_auth": "Neplatný auth token.",
+      "cannot_connect": "Nedá sa pripojiť k Freemap API."
+    },
+    "abort": {
+      "already_configured": "Táto konfigurácia je už nastavená."
+    }
+  }
+}

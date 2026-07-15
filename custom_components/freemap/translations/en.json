@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Freemap Tracking",
+        "description": "Enter your authentication token or public device tokens.\n\n{token_help}",
+        "data": {
+          "auth_token": "Auth token (for owned devices)",
+          "public_tokens": "Public tokens (comma-separated, e.g. RaAiejax)"
+        }
+      }
+    },
+    "error": {
+      "no_credentials": "Enter at least an auth token or one public token.",
+      "invalid_auth": "Invalid auth token.",
+      "cannot_connect": "Cannot connect to Freemap API."
+    },
+    "abort": {
+      "already_configured": "This configuration is already set up."
+    }
+  }
+}
