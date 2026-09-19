@@ -110,11 +110,9 @@ class FreemapCoordinator:
                     ws_url += f"&authToken={self.auth_token}"
 
                 # No aiohttp-level heartbeat: the Freemap server implements its own
-                # application-level ping/pong over text frames (see below), and a
-                # client-initiated WS-protocol PING confuses its JSON-RPC parser,
-                # producing a recurring "-32700 Parse error".
+                # application-level ping/pong over text frames (see below).
                 async with self._session.ws_connect(ws_url) as ws:
-                    _LOGGER.warning("Freemap[diag]: WebSocket connected")
+                    _LOGGER.info("Freemap: WebSocket connected")
                     self._pending.clear()
                     self._msg_counter = 0
 
@@ -125,8 +123,6 @@ class FreemapCoordinator:
                             if msg.data == "ping":
                                 await ws.send_str("pong")
                                 continue
-                            if '"error"' in msg.data:
-                                _LOGGER.warning("Freemap[diag]: raw error frame: %s", msg.data)
                             try:
                                 self._dispatch(json.loads(msg.data))
                             except json.JSONDecodeError:
@@ -159,7 +155,7 @@ class FreemapCoordinator:
                 "id": msg_id,
                 "params": params,
             })
-            _LOGGER.warning("Freemap[diag]: subscribed to %s (%s) as id=%s", name, key, msg_id)
+            _LOGGER.debug("Freemap: subscribed to %s (%s)", name, key)
 
     def _dispatch(self, data: dict) -> None:
         method = data.get("method")
@@ -185,8 +181,9 @@ class FreemapCoordinator:
                 _LOGGER.warning(
                     "Freemap: RPC error for %s: %s", self.device_names.get(key, key), data["error"]
                 )
-            else:
-                _LOGGER.warning("Freemap: RPC error: %s", data["error"])
+            # Else: not a response to anything we sent (no id) - observed as a
+            # recurring, roughly 30s-periodic broadcast from the Freemap server
+            # unrelated to our own requests/devices. Harmless to us; ignored.
 
     def _update(self, key: Any, point: dict) -> None:
         self.latest_data[key] = point
