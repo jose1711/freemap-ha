@@ -109,7 +109,11 @@ class FreemapCoordinator:
                 if self.auth_token:
                     ws_url += f"&authToken={self.auth_token}"
 
-                async with self._session.ws_connect(ws_url, heartbeat=30) as ws:
+                # No aiohttp-level heartbeat: the Freemap server implements its own
+                # application-level ping/pong over text frames (see below), and a
+                # client-initiated WS-protocol PING confuses its JSON-RPC parser,
+                # producing a recurring "-32700 Parse error".
+                async with self._session.ws_connect(ws_url) as ws:
                     _LOGGER.info("Freemap: WebSocket connected")
                     self._pending.clear()
                     self._msg_counter = 0
@@ -173,7 +177,14 @@ class FreemapCoordinator:
                     self._update(key, points[-1])
 
         elif "error" in data:
-            _LOGGER.warning("Freemap: RPC error: %s", data["error"])
+            msg_id = data.get("id")
+            key = self._pending.pop(msg_id, None) if msg_id is not None else None
+            if key is not None:
+                _LOGGER.warning(
+                    "Freemap: RPC error for %s: %s", self.device_names.get(key, key), data["error"]
+                )
+            else:
+                _LOGGER.warning("Freemap: RPC error: %s", data["error"])
 
     def _update(self, key: Any, point: dict) -> None:
         self.latest_data[key] = point
