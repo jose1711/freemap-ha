@@ -114,7 +114,7 @@ class FreemapCoordinator:
                 # client-initiated WS-protocol PING confuses its JSON-RPC parser,
                 # producing a recurring "-32700 Parse error".
                 async with self._session.ws_connect(ws_url) as ws:
-                    _LOGGER.info("Freemap: WebSocket connected")
+                    _LOGGER.warning("Freemap[diag]: WebSocket connected")
                     self._pending.clear()
                     self._msg_counter = 0
 
@@ -125,6 +125,8 @@ class FreemapCoordinator:
                             if msg.data == "ping":
                                 await ws.send_str("pong")
                                 continue
+                            if '"error"' in msg.data:
+                                _LOGGER.warning("Freemap[diag]: raw error frame: %s", msg.data)
                             try:
                                 self._dispatch(json.loads(msg.data))
                             except json.JSONDecodeError:
@@ -157,7 +159,7 @@ class FreemapCoordinator:
                 "id": msg_id,
                 "params": params,
             })
-            _LOGGER.debug("Freemap: subscribed to %s (%s)", name, key)
+            _LOGGER.warning("Freemap[diag]: subscribed to %s (%s) as id=%s", name, key, msg_id)
 
     def _dispatch(self, data: dict) -> None:
         method = data.get("method")
